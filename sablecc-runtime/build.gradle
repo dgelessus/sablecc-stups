@@ -1,29 +1,6 @@
-apply plugin: 'application'
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
-
-wrapper {
-  gradleVersion = "5.4"
-  distributionType = Wrapper.DistributionType.ALL
+plugins {
+  id "java-library"
 }
-
-allprojects {
-  project.group = 'de.hhu.stups'
-  project.version = '3.2.14-SNAPSHOT'
-  
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
-}
-
-project.archivesBaseName = "sablecc"
-
-repositories {
-  mavenLocal()
-  jcenter()
-}
-
-mainClassName = "org.sablecc.sablecc.SableCC"
 
 task javadocJar(type: Jar) {
   archiveClassifier.set("javadoc")
@@ -35,41 +12,14 @@ task sourcesJar(type: Jar) {
   from sourceSets.main.allSource
 }
 
-jar {
-  manifest {
-    attributes 'Main-Class': mainClassName
-  }
-}
-
 artifacts {
   archives javadocJar, sourcesJar
 }
 
-task writeVersion() {
-
-  doFirst {
-    def buildconstants_class = """
-package org.sablecc.sablecc;
-
-public class Version
-{
-  public static final String VERSION = "${project.version}";
-}
-"""
-    File f = file("src/main/java/org/sablecc/sablecc/Version.java")
-    f.delete()
-    f <<  buildconstants_class
-  }
-}
-
-compileJava {
-  dependsOn = ['writeVersion']
-}
-
 if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
-
+  
   apply plugin: 'signing'
-
+  
   signing {
     sign configurations.archives
   }
@@ -77,36 +27,36 @@ if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')
     repositories {
       mavenDeployer {
         beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
+        
         repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
           authentication(userName: ossrhUsername, password: ossrhPassword)
         }
-
+        
         snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
           authentication(userName: ossrhUsername, password: ossrhPassword)
         }
-
+        
         pom.project {
-          name 'SableCC - Stups fork'
+          name 'SableCC - Stups fork (runtime library)'
           packaging 'jar'
           // optionally artifactId can be defined here
-          description 'This version of SableCC enriches the abstract syntax tree with information about tokens.'
+          description 'This is the runtime support library for the Stups fork of SableCC. It provides common classes and interfaces used by the generated parsers at runtime.'
           url 'https://github.com/bendisposto/sablecc-stups'
-
+          
           licenses {
             license {
               name 'GNU Lesser General Public License, Version 2.1'
               url 'http://www.gnu.org/licenses/lgpl-2.1.html'
             }
           }
-
+          
           scm {
             connection 'scm:git:git://github.com/bendisposto/sablecc-stups.git'
             developerConnection 'scm:git:git@github.com:bendisposto/sablecc-stups.git'
             url 'https://github.com/bendisposto/sablecc-stups'
           }
-
-
+          
+          
           developers {
             developer {
               id 'bendisposto'
