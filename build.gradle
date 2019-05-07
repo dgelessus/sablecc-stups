@@ -9,11 +9,13 @@ wrapper {
 }
 
 allprojects {
+  apply plugin: 'java'
+  
   project.group = 'de.hhu.stups'
   project.version = '3.2.14-SNAPSHOT'
   
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
+  project.sourceCompatibility = 1.6
+  project.targetCompatibility = 1.6
 }
 
 project.archivesBaseName = "sablecc"
