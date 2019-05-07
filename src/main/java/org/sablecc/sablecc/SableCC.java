@@ -113,33 +113,6 @@ public class SableCC {
 			}
 		}
 
-		/*
-		 * extract additional stups-classes from .jar-file
-		 */
-		String generated = ".";
-		boolean found = false;
-		for (String p : arguments) {
-			if (found) {
-				generated = p;
-				break;
-			}
-
-			if ("-d".equals(p)) {
-				found = true;
-			}
-		}
-
-		String patchFolder = generated + "/de/hhu/stups/sablecc/patch";
-		String[] patchFiles = { "IParser", "IToken", "ITokenListContainer",
-				"PositionedNode", "SourcePosition", "SourcePositions",
-				"SourcecodeRange" };
-
-		new File(patchFolder).mkdirs();
-
-		for (String f : patchFiles) {
-			extractPatchFile(patchFolder, f);
-		}
-
 		try {
 			for (int i = 0; i < filename.size(); i++) {
 				processGrammar((String) filename.elementAt(i), d_option);
@@ -149,74 +122,6 @@ public class SableCC {
 			System.exit(1);
 		}
 		System.exit(0);
-	}
-
-	private static void extractPatchFile(String patchFolder, String patchFile) {
-
-		ClassLoader loader = SableCC.class.getClassLoader();
-		InputStream input = loader.getResourceAsStream("patchfiles/"
-				+ patchFile + ".txt");
-		String output = "";
-
-		String outputFile = patchFolder + "/" + patchFile + ".java";
-		try {
-			output = convertStreamToString(input);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		Writer writer = null;
-		try {
-			File file = new File(outputFile);
-			writer = new BufferedWriter(new FileWriter(file));
-			writer.write(output);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} finally {
-			try {
-				if (writer != null) {
-					writer.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
-	}
-
-	private static String convertStreamToString(InputStream is)
-			throws IOException {
-		/*
-		 * To convert the InputStream to String we use the Reader.read(char[]
-		 * buffer) method. We iterate until the Reader return -1 which means
-		 * there's no more data to read. We use the StringWriter class to
-		 * produce the string.
-		 */
-
-		if (is != null) {
-			Writer writer = new StringWriter();
-
-			char[] buffer = new char[1024];
-			try {
-				Reader reader = new BufferedReader(new InputStreamReader(is,
-						"UTF-8"));
-				int n;
-				while ((n = reader.read(buffer)) != -1) {
-					writer.write(buffer, 0, n);
-				}
-			} finally {
-				is.close();
-			}
-			return writer.toString();
-		} else {
-			return "";
-		}
-
 	}
 
 	/**
